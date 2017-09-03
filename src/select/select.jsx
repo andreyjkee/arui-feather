@@ -365,6 +365,7 @@ class Select extends React.Component {
                 directions={ this.props.directions }
                 height='adaptive'
                 padded={ false }
+                secondaryOffset={ -28 }
                 size={ this.props.size }
                 target={ this.state.isMobile ? 'screen' : 'anchor' }
                 header={ this.state.isMobile && this.renderMobileHeader(cn) }
