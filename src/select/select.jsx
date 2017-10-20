@@ -202,6 +202,12 @@ class Select extends React.Component {
             this.toggleOpened();
         }
 
+        if (this.props.mode !== 'check' && nextProps.value[0] !== this.state.value[0]) {
+            // console.log(nextProps.value);
+            // console.log(this.state.value);
+            // console.log('##############');
+        }
+
         this.setState({
             hasGroup: this.props.options.some(option => !!(option.type === 'group' && !!option.content))
         });
@@ -384,8 +390,9 @@ class Select extends React.Component {
                     content={ optionsList }
                     onItemCheck={ this.handleOptionCheck }
                     checkedItems={ value }
-                    onFocus={ this.handleMenuFocus }
                     onBlur={ this.handleMenuBlur }
+                    onFocus={ this.handleMenuFocus }
+                    onHighlightItem={ this.handleMenuHighlightItem }
                     onKeyDown={ this.handleMenuKeyDown }
                 />
             </Popup>
@@ -540,6 +547,13 @@ class Select extends React.Component {
     }
 
     @autobind
+    handleMenuHighlightItem(highlightedItem) {
+        if (!this.getOpened() && highlightedItem) {
+            this.scrollToHighlightedItem(highlightedItem);
+        }
+    }
+
+    @autobind
     handleOptionCheck(value) {
         let opened = this.getOpened();
 
@@ -620,7 +634,7 @@ class Select extends React.Component {
             case keyboardCode.DOWN_ARROW:
             case keyboardCode.UP_ARROW:
                 event.preventDefault();
-                this.syncKeyboardNavigationWithScroll(highlightedItem);
+                this.scrollToHighlightedItem(highlightedItem);
                 break;
             case keyboardCode.ENTER:
             case keyboardCode.SPACE:
@@ -751,23 +765,25 @@ class Select extends React.Component {
     /**
      * @param {MenuItem} highlightedItem Выбранный в текущий момент пункт меню
      */
-    syncKeyboardNavigationWithScroll(highlightedItem) {
+    scrollToHighlightedItem(highlightedItem) {
         let element = highlightedItem.getNode();
         let container = this.popup.getInnerNode();
         let correction = element.offsetHeight;
 
-        if (element.offsetTop + correction > container.scrollTop + container.offsetHeight) {
-            scrollTo({
-                container,
-                targetY: element.offsetTop,
-                duration: SCROLL_TO_NORMAL_DURATION
-            });
-        } else if (element.offsetTop < container.scrollTop) {
-            scrollTo({
-                container,
-                targetY: (element.offsetTop - container.offsetHeight) + correction,
-                duration: SCROLL_TO_NORMAL_DURATION
-            });
+        if (container) {
+            if (element.offsetTop + correction > container.scrollTop + container.offsetHeight) {
+                scrollTo({
+                    container,
+                    targetY: element.offsetTop,
+                    duration: SCROLL_TO_NORMAL_DURATION
+                });
+            } else if (element.offsetTop < container.scrollTop) {
+                scrollTo({
+                    container,
+                    targetY: (element.offsetTop - container.offsetHeight) + correction,
+                    duration: SCROLL_TO_NORMAL_DURATION
+                });
+            }
         }
     }
 
